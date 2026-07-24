@@ -1,0 +1,59 @@
+JETLIST — FIREBASE SETUP CHECKLIST
+====================================
+
+PART 1: FIREBASE CONSOLE (your browser, no code)
+--------------------------------------------------
+[x] 1. Go to https://console.firebase.google.com and create a new project
+       (name it "jetlist" or similar). Google Analytics is optional — skip it.
+[x] 2. In the left sidebar: Build > Authentication > Get started.
+       Click "Email/Password" under Sign-in method, enable it, Save.
+[x] 3. In the left sidebar: Build > Firestore Database > Create database.
+       Started in PRODUCTION MODE (locked-down rules from the start — see
+       Part 3 below for the actual rules used).
+[x] 4. Go to Project Settings (gear icon, top left) > General tab.
+       Scroll to "Your apps" > click the </> (Web) icon to register a new app.
+       Named it "jetlist-web".
+[x] 5. Copied the firebaseConfig values into .env / .env.example.
+
+PART 2: LOCAL CODE CHANGES
+--------------------------------------------------
+[x] 6. Installed the SDK: npm install firebase
+[x] 7. Added VITE_FIREBASE_* vars to .env and .env.example.
+[x] 8. Created src/lib/firebase.js — initializes the Firebase app and
+       exports `auth` (Firebase Auth) and `db` (Firestore) instances.
+[x] 9. Rewrote src/context/AuthContext.jsx to use real Firebase Auth:
+         signUp  -> createUserWithEmailAndPassword(auth, email, password)
+         logIn   -> signInWithEmailAndPassword(auth, email, password)
+         logOut  -> signOut(auth)
+         user    -> onAuthStateChanged(auth, setUser)
+       (Auth.jsx already had a password field; updated it to await the
+       now-async signUp/logIn and show friendly Firebase error messages.)
+[x] 10. Rewrote src/context/TripsContext.jsx — saved trips now live-sync
+        from Firestore (users/{uid}/trips) via onSnapshot instead of
+        per-user localStorage.
+
+PART 3: LOCK IT DOWN
+--------------------------------------------------
+[x] 11. Firestore Rules (published):
+          rules_version = '2';
+          service cloud.firestore {
+            match /databases/{database}/documents {
+              match /users/{userId}/trips/{tripId} {
+                allow read, write: if request.auth != null && request.auth.uid == userId;
+              }
+            }
+          }
+        A signed-in user can only read/write their own trips subcollection.
+[ ] 12. If/when deployed to Vercel: add the same VITE_FIREBASE_* env vars
+        under Project Settings > Environment Variables, then redeploy.
+
+STATUS: Auth + Firestore fully working and tested (signup, login, hard
+reload on a protected route, save/read/delete trips all verified with a
+real browser + real Firebase project). Only Vercel deploy (step 12) is
+left, whenever you actually deploy.
+
+Also fixed while testing: ProtectedRoute.jsx wasn't waiting for Firebase's
+async session check on load, so a hard refresh on /dashboard would flash
+the Auth page's "already signed in" card instead of the real Dashboard for
+a signed-in user. Fixed by gating the redirect on the `ready` flag from
+AuthContext.
