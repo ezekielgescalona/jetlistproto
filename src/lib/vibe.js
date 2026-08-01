@@ -1,16 +1,3 @@
-/**
- * vibe.js — the "vibe engine" 🎛️
- *
- * Pure functions (no fetching) that translate:
- *   vibe slider (0–100)  +  live weather  +  destination country
- * into the Spotify search queries used to build the playlist.
- *
- * Why search queries instead of Spotify's recommendation engine?
- * Spotify deprecated /recommendations and /audio-features for apps
- * created after Nov 27, 2024 — new apps get 403 errors from them.
- * So JetList builds playlists from the Search endpoint instead,
- * blending three angles: mood, weather, and local flavor.
- */
 
 /** Slider level → a mood label + keyword seeds. */
 export function describeVibe(level) {
@@ -34,14 +21,7 @@ export function weatherFlavor(condition, tempF) {
   return 'sunny day';
 }
 
-/**
- * Build the final search plan.
- * Returns { label, queries } where queries feed spotify.searchTracks().
- * Three queries = three angles on the destination:
- *   1. pure mood            → matches the slider
- *   2. weather × mood       → live conditions steer the sound
- *   3. local flavor         → surfaces music tied to the country
- */
+
 export function buildQueries({ vibeLevel, condition, tempF, countryName }) {
   const vibe = describeVibe(vibeLevel);
   const flavor = weatherFlavor(condition, tempF);
@@ -56,7 +36,6 @@ export function buildQueries({ vibeLevel, condition, tempF, countryName }) {
   };
 }
 
-/** Format milliseconds as m:ss for track durations. */
 export function formatDuration(ms) {
   const totalSec = Math.round(ms / 1000);
   const min = Math.floor(totalSec / 60);
