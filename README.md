@@ -96,17 +96,3 @@ src/
 └── lib/            # firebase.js (app/auth/db init) + vibe.js (slider + weather → search queries)
 ```
 
-## 📸 Screenshots
-*(Replace these placeholders with real captures before final submission.)*
-
-| Page | Screenshot |
-|---|---|
-| Home | `[screenshot]` |
-| Discover (vibe slider) | `[screenshot]` |
-| Playlist detail (map + charts) | `[screenshot]` |
-| Dashboard | `[screenshot]` |
-
-## 🗓️ Roadmap
-* ✅ Checkpoint 1 — 3 APIs wired end-to-end, 5 routes, both visualizations, responsive UI
-* ✅ Firebase Authentication + Firestore — real accounts (`src/context/AuthContext.jsx`) and saved trips sync per-account via Firestore (`src/context/TripsContext.jsx`) instead of localStorage
-* 💡 Stretch — shareable playlist links, animations, GenAI trip blurbs (extra credit ideas from the spec)
