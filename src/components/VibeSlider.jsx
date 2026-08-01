@@ -1,10 +1,5 @@
 import { describeVibe } from '../lib/vibe';
 
-/**
- * The "vibe dial" — a range input styled like a mixing-desk fader.
- * The mono readout updates live so users see exactly how their
- * slider position translates into a playlist mood.
- */
 export default function VibeSlider({ value, onChange }) {
   const { label } = describeVibe(value);
 
